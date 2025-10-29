@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Public routes
-  const publicRoutes = ['/', '/pages/login', 'pages/signup'];
+  const publicRoutes = ['/', '/pages/login', '/pages/signup'];
   const isPublicRoute = publicRoutes.includes(pathname);
 
   // If trying to access protected route without token
