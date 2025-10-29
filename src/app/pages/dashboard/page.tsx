@@ -1,0 +1,293 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
+import { Key, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useApp } from "../../../context/AppContext";
+import { changeGoal } from "../../action/changeGoal";
+
+export default function DashboardPage() {
+  const { state, dispatch } = useApp();
+  const [showEditField, setShowEditField] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isChangingGoal, setIsChangingGoal] = useState("noAction");
+  const [isSureLogout, setIsSureLogout] = useState(false);
+  const [input, setInput] = useState("");
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!state.isAuthenticated) {
+      router.push("/pages/login");
+    }
+
+    if (!state.user?.id) return;
+
+    const userId = state.user.id;
+
+    const fetchConversation = async () => {
+      try {
+        const res = await fetch(
+          `/api/conversation?userId=${encodeURIComponent(userId)}`
+        );
+
+        if (!res.ok) {
+          return;
+        }
+
+        const data = await res.json();
+
+        if (data?.messages) {
+          dispatch({ type: "SET_MESSAGES", payload: data.messages });
+        }
+      } catch (error) {
+        console.error("Error fetching conversation:", error);
+        return;
+      }
+    };
+
+    fetchConversation();
+  }, [state.isAuthenticated, state.user?.id, router]);
+
+  const handleLogout = () => {
+    dispatch({ type: "LOGOUT" });
+    document.cookie = "token=; path=/; max-age=0;";
+    router.push("/");
+  };
+
+  if (!state.user) return null;
+
+  async function handleChangeGoal() {
+    setIsChangingGoal("processing");
+    if (!state.user) return;
+
+    try {
+      setIsLoading(true);
+
+      const response = await changeGoal(state.user.id, input);
+
+      const { user } = response;
+
+      if (response.success === false) {
+        throw new Error(response.message);
+      } else if (response.success === true && user) {
+        dispatch({ type: "CLEAR_MESSAGES" });
+
+        const updatedUser = {
+          ...user,
+          goal: user.goal ?? undefined,
+          level: user.level ?? undefined,
+        };
+
+        dispatch({
+          type: "SET_USER",
+          payload: {
+            user: updatedUser,
+            token: state.token!,
+          },
+        });
+      }
+
+      setIsChangingGoal("successful");
+
+      setTimeout(() => {
+        setShowModal(false);
+        setShowEditField(false);
+        setIsChangingGoal("noAction");
+      }, 2500);
+    } catch (error: any) {
+      setIsChangingGoal("error");
+      console.error("error update goal! ", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {showModal && (
+        <div className="fixed inset-0 backdrop-blur-xs flex items-center justify-center z-50">
+          {isChangingGoal === "noAction" ? (
+            <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md h-80 flex flex-col justify-center">
+              <p className="text-gray-800 text-center text-lg">
+                Are you sure you want to change your goal to
+              </p>
+              <p className="text-indigo-600 text-center text-lg font-bold">
+                {input}
+              </p>
+              <p className="text-gray-800 text-center text-lg">
+                This will reset your current progress.
+              </p>
+              <button
+                className="mt-6 cursor-pointer bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition"
+                onClick={() => {
+                  handleChangeGoal();
+                }}
+              >
+                {!isLoading ? "Save Change" : "Saving.."}
+              </button>
+              <button
+                onClick={() => setShowModal(false)}
+                className="mt-6 cursor-pointer bg-red-500 text-white  hover:bg-red-600 py-3 rounded-lg font-semibold transition"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : isChangingGoal === "processing" ? (
+            <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md h-80 flex flex-col justify-center">
+              <p className="text-gray-800 text-center text-lg">
+                Changing your goal, please wait...
+              </p>
+            </div>
+          ) : isChangingGoal === "successful" ? (
+            <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md h-80 flex flex-col justify-center">
+              <p className="text-gray-800 text-center text-lg">
+                Your goal has been successfully changed!
+              </p>
+            </div>
+          ) : (
+            <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md h-80 flex flex-col justify-center">
+              <p className="text-gray-800 text-center text-lg">
+                An error occurred while changing your goal. Please try again.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {isSureLogout && (
+        <div className="fixed p-5 inset-0 backdrop-blur-xs flex items-center justify-center z-50">
+
+            <div className="bg-white gap-5 p-6 rounded-2xl shadow-xl w-full max-w-md flex flex-col items-center justify-center">
+
+          <p className="text-gray-800 text-lg">Are you sure you want to logout?</p>
+          <div className="w-full flex justify-center gap-5">
+        <button
+          onClick={handleLogout}
+          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-800 transition"
+        >
+          Yes
+        </button>
+        <button
+          onClick={() => setIsSureLogout(false)}
+          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-700 transition"
+        >
+          No
+        </button>
+
+          </div>
+            </div>
+
+          
+        </div>
+      )}
+
+      <header className="bg-white shadow-sm p-4 flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-indigo-600">My Dashboard</h1>
+        <button
+          onClick={() => setIsSureLogout(true)}
+          className={`px-5 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition`}
+        >
+          Logout
+        </button>
+
+      </header>
+
+      <div className="container mx-auto p-6 max-w-4xl">
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
+          <h2 className="text-3xl font-bold text-gray-800 mb-4">
+            Welcome {state.user.name}! 👋
+          </h2>
+          <div className="grid md:grid-cols-2 gap-4 mt-6">
+            <div className="bg-indigo-50 transition-all duration-300 p-4 rounded-lg">
+              <div className="flex justify-between">
+                <p className="text-sm text-gray-600 mb-1 flex-1">Your Goal</p>
+                <button
+                  onClick={() => setShowEditField(!showEditField)}
+                  className={`text-sm text-white mb-1 bg-[#6B7280] ${
+                    showEditField ? "w-20" : "w-14"
+                  } transition-all duration-300 cursor-pointer hover:scale-105 px-2 py-1 rounded-lg hover:bg-orange-300`}
+                >
+                  {showEditField ? "Close" : "Edit"}
+                </button>
+              </div>
+              {showEditField ? (
+                <div className="flex space-x-2">
+                  <input
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && input.trim() !== "") {
+                        setShowModal(true);
+                      }
+                    }}
+                    onChange={(e) => setInput(e.target.value)}
+                    required
+                    className="flex-1 px-4 text-black py-2 border border-gray-300 rounded-lg focus:ring-2 w-full focus:ring-indigo-500"
+                    type="text"
+                    placeholder="what is your new goal?"
+                  />
+
+                  <button
+                    onClick={() => setShowModal(true)}
+                    disabled={input.trim() === ""}
+                    className="bg-indigo-600 text-white w-20 py-2 rounded-lg font-semibold hover:bg-indigo-700 disabled:bg-gray-400 transition"
+                  >
+                    Save
+                  </button>
+                </div>
+              ) : (
+                <p className="text-lg font-semibold text-indigo-700">
+                  {state.user.goal || "Not set"}
+                </p>
+              )}
+            </div>
+            <div className="bg-green-50 p-4 rounded-lg">
+              <p className="text-sm text-gray-600 mb-1">Your Level</p>
+              <p className="text-lg font-semibold text-green-700">
+                {state.user.level || "Not set"}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-xl p-8">
+          <h3 className="text-2xl font-bold text-gray-800 mb-4">
+            Recent Lesson
+          </h3>
+          <div className="space-y-3">
+            {state.messages.slice(-3).map(
+              (
+                msg: {
+                  role: string;
+                  content: string;
+                },
+                index: Key
+              ) => (
+                <div
+                  key={index}
+                  className={`p-4 rounded-lg ${
+                    msg.role === "assistant"
+                      ? "bg-blue-50 border-l-4 border-indigo-500"
+                      : "bg-gray-50"
+                  }`}
+                >
+                  <p className="text-sm font-semibold text-gray-600 mb-1">
+                    {msg.role === "assistant" ? "Verba" : "You"}
+                  </p>
+                  <p className="text-gray-800">{msg.content}</p>
+                </div>
+              )
+            )}
+          </div>
+          <button
+            onClick={() => router.push("/pages/lesson")}
+            className="mt-6 w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition"
+          >
+            {state.messages.length === 0 ? "Start lesson" : "Continue Learning"}
+          </button>
+        </div>
+      </div>
+      
+    </div>
+  );
+}
