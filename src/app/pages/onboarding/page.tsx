@@ -22,7 +22,6 @@ export default function OnboardingPage() {
     setIsInitialized(true);
   }, [state.isAuthenticated, router, dispatch]);
 
-  // Add greeting only after initialization and if no messages exist
   useEffect(() => {
     if (!isInitialized || !state.isAuthenticated) return;
 
@@ -117,7 +116,6 @@ export default function OnboardingPage() {
           type: "SET_ONBOARDING_COMPLETE",
         });
 
-        // setTimeout(() => router.push('/dashboard'), 5000);
       }
     } catch (error: any) {
       dispatch({

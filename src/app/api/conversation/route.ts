@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// ✅ GET /api/conversation?userId=123
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);

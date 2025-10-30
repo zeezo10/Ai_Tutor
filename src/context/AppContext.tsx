@@ -2,7 +2,6 @@
 
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 
-// ✅ Export Types
 export interface LessonData {
   title: string;
   greeting: string;
@@ -138,19 +137,16 @@ export function useApp() {
   return context;
 }
 
-// ✅ Type Guard
 export function isLessonMessage(msg: Message): msg is Message & { lessonData: LessonData } {
   return msg.lessonData !== undefined;
 }
 
-// ✅ Helper Functions
 export const clearAuthData = () => {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('appState');
   }
 };
 
-// ✅ Custom Hook
 export function useMessages() {
   const { state, dispatch } = useApp();
   

@@ -1,4 +1,3 @@
-// ✅ 1. عرّف LessonData أولاً
 export interface LessonData {
   title: string;
   greeting: string;
@@ -6,11 +5,11 @@ export interface LessonData {
   practice: string;
 }
 
-// ✅ 2. ثم استخدمه في Message
+
 export interface Message {
   role: "user" | "assistant";
   content: string;
-  lessonData?: LessonData; // الآن LessonData معرّف
+  lessonData?: LessonData; 
 }
 
 export interface User {
@@ -40,7 +39,6 @@ export interface ChatResponse {
   onboardingComplete?: boolean;
 }
 
-// ✅ 3. حدّث LessonResponse ليرجع object بدلاً من string
 export interface LessonResponse {
-  lesson: LessonData; // ✅ بدلاً من string
+  lesson: LessonData; 
 }

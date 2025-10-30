@@ -8,16 +8,10 @@ import { Content, GoogleGenerativeAI } from "@google/generative-ai";
 const gemini = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const GEMINI_MODEL = "gemini-2.5-flash";
 
-/**
- * Maps the conversation history array from your application's state/database
- * into the required Content[] format for the Gemini API.
- * FIX: This now reconstructs the full assistant message (greeting + lesson + practice)
- * from either 'lessonData' (recent state) or 'content' (DB-stored JSON string)
- * to ensure the AI remembers what it asked.
- */
+
 const mapConversationHistory = (history: any[]): Content[] => {
   return history.map((msg) => {
-    // 1. Handle user messages (straightforward)
+
     if (msg.role === "user") {
       return {
         role: "user",
@@ -25,28 +19,23 @@ const mapConversationHistory = (history: any[]): Content[] => {
       };
     }
 
-    // 2. Handle assistant messages
+    
     if (msg.role === "assistant") {
       let lesson;
 
-      // Check if it's the recent, parsed object structure
+      
       if (msg.lessonData) {
         lesson = msg.lessonData;
       }
-      // Check if it's the database-stored JSON string
       else if (msg.content) {
         try {
-          // Attempt to parse the JSON string saved in 'content'
           lesson = JSON.parse(msg.content);
         } catch (e) {
-          // If parsing fails, just send the raw content, which might be an empty string
           return { role: "model", parts: [{ text: msg.content }] };
         }
       }
 
-      // If we successfully retrieved the lesson data, reconstruct the full message
       if (lesson && lesson.greeting && lesson.lesson && lesson.practice) {
-        // Combine the relevant output fields into a single text block
         const modelContent = `${lesson.greeting} ${lesson.lesson} ${lesson.practice}`;
         return {
           role: "model",
@@ -55,12 +44,10 @@ const mapConversationHistory = (history: any[]): Content[] => {
       }
     }
 
-    // Fallback for any unrecognizable message
     return { role: "model", parts: [{ text: "" }] };
   });
 };
 
-// Retry function with exponential backoff (unchanged)
 async function retryWithBackoff<T>(
   fn: () => Promise<T>,
   maxRetries: number = 3,
@@ -74,7 +61,6 @@ async function retryWithBackoff<T>(
     } catch (error: any) {
       lastError = error;
 
-      // Check if it's a retryable error (503, 429, or network errors)
       const isRetryable =
         error?.status === 503 ||
         error?.status === 429 ||
@@ -85,8 +71,6 @@ async function retryWithBackoff<T>(
       if (!isRetryable || attempt === maxRetries) {
         throw error;
       }
-
-      // Calculate delay with exponential backoff
       const delay = baseDelay * Math.pow(2, attempt);
       console.log(
         `Retry attempt ${attempt + 1}/${maxRetries} after ${delay}ms...`
@@ -125,7 +109,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // --- REFINED SYSTEM PROMPT for better conversational flow ---
     const systemPrompt = `
 You are Verba, a friendly English tutor.
 
@@ -147,9 +130,7 @@ Return only valid JSON, no extra text.
   "practice": "1 short question"
 }
 `;
-    // --- END REFINED SYSTEM PROMPT ---
 
-    // Increase history depth to provide better context for conversational continuity
     const limitedHistory = conversationHistory.slice(-20);
 
 
@@ -163,7 +144,6 @@ Return only valid JSON, no extra text.
         temperature: 0.65,
         topP: 0.9,
         topK: 40,
-        // Increased token limit for safety
         maxOutputTokens: 1024,
       },
     });
@@ -173,11 +153,10 @@ Return only valid JSON, no extra text.
       { role: "user", parts: [{ text: message }] },
     ];
 
-    // Use retry mechanism for API call
     const result = await retryWithBackoff(
       async () => await model.generateContent({ contents }),
-      3, // max retries
-      1000 // initial delay in ms
+      3, 
+      1000 
     );
 
     let lessonText =
@@ -209,7 +188,6 @@ Return only valid JSON, no extra text.
 
     lessonText = lessonText.trim();
 
-    // Clean up markdown wrapping if present
     if (lessonText.startsWith("```json")) {
       lessonText = lessonText.replace(/```json\n?/g, "").replace(/```\n?/g, "");
     }
@@ -225,10 +203,9 @@ Return only valid JSON, no extra text.
       );
     }
 
-    // Strict check for the required structure
     if (
       !lesson.title ||
-      typeof lesson.greeting === "undefined" || // Allow empty string ""
+      typeof lesson.greeting === "undefined" || 
       !lesson.lesson ||
       !lesson.practice
     ) {
@@ -239,14 +216,12 @@ Return only valid JSON, no extra text.
       );
     }
 
-    // --- Database Logging ---
     const existingConversation = await prisma.conversation.findFirst({
       where: {
         userId: user.id,
       },
     });
 
-    // Stringify the lesson object for storage in the database
     const lessonContent = JSON.stringify(lesson);
 
     if (!existingConversation) {
@@ -255,7 +230,6 @@ Return only valid JSON, no extra text.
           userId: user.id,
           messages: [
             { role: "user", content: message },
-            // Store the JSON string for the assistant's turn
             { role: "assistant", content: lessonContent },
           ],
         },
@@ -277,12 +251,10 @@ Return only valid JSON, no extra text.
       });
     }
 
-    // Return the parsed lesson object
     return NextResponse.json({ lesson });
   } catch (error: any) {
     console.error("Lesson error:", error);
 
-    // Specific error handling for service issues
     if (error?.status === 503 || error?.message?.includes("overloaded")) {
       return NextResponse.json(
         {

@@ -137,80 +137,118 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {showModal && (
-        <div className="fixed inset-0 backdrop-blur-xs flex items-center justify-center z-50">
-          {isChangingGoal === "noAction" ? (
-            <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md h-80 flex flex-col justify-center">
-              <p className="text-gray-800 text-center text-lg">
-                Are you sure you want to change your goal to
-              </p>
-              <p className="text-indigo-600 text-center text-lg font-bold">
-                {input}
-              </p>
-              <p className="text-gray-800 text-center text-lg">
-                This will reset your current progress.
-              </p>
-              <button
-                className="mt-6 cursor-pointer bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition"
-                onClick={() => {
-                  handleChangeGoal();
-                }}
-              >
-                {!isLoading ? "Save Change" : "Saving.."}
-              </button>
-              <button
-                onClick={() => setShowModal(false)}
-                className="mt-6 cursor-pointer bg-red-500 text-white  hover:bg-red-600 py-3 rounded-lg font-semibold transition"
-              >
-                Cancel
-              </button>
-            </div>
-          ) : isChangingGoal === "processing" ? (
-            <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md h-80 flex flex-col justify-center">
-              <p className="text-gray-800 text-center text-lg">
-                Changing your goal, please wait...
-              </p>
-            </div>
-          ) : isChangingGoal === "successful" ? (
-            <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md h-80 flex flex-col justify-center">
-              <p className="text-gray-800 text-center text-lg">
-                Your goal has been successfully changed!
-              </p>
-            </div>
-          ) : (
-            <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md h-80 flex flex-col justify-center">
-              <p className="text-gray-800 text-center text-lg">
-                An error occurred while changing your goal. Please try again.
-              </p>
-            </div>
-          )}
-        </div>
+       <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 transition-all duration-300">
+  {isChangingGoal === "noAction" ? (
+    <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md transform transition-all duration-300">
+      <h2 className="text-2xl font-semibold text-gray-900 text-center mb-4">
+        Change Goal
+      </h2>
+      <p className="text-gray-600 text-center mb-2">
+        Are you sure you want to change your goal to
+      </p>
+      <p className="text-indigo-600 text-center text-xl font-bold mb-4">
+        {input}
+      </p>
+      <p className="text-gray-500 text-center">
+        This will reset your current progress.
+      </p>
+
+      <div className="mt-8 flex flex-col gap-3">
+        <button
+          onClick={handleChangeGoal}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold shadow-sm transition-all duration-200"
+        >
+          {!isLoading ? "Save Change" : "Saving..."}
+        </button>
+        <button
+          onClick={() => setShowModal(false)}
+          className="bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-semibold transition-all duration-200"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  ) : isChangingGoal === "processing" ? (
+    <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md flex flex-col items-center justify-center gap-4">
+      <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+      <p className="text-gray-700 text-lg text-center">
+        Changing your goal, please wait...
+      </p>
+    </div>
+  ) : isChangingGoal === "successful" ? (
+    <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md flex flex-col items-center justify-center gap-4">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="w-14 h-14 text-green-500"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={2}
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M5 13l4 4L19 7"
+        />
+      </svg>
+      <p className="text-gray-800 text-center text-lg font-medium">
+        Your goal has been successfully changed!
+      </p>
+    </div>
+  ) : (
+    <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md flex flex-col items-center justify-center gap-4">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="w-14 h-14 text-red-500"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={2}
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+      <p className="text-gray-800 text-center text-lg font-medium">
+        An error occurred while changing your goal.
+      </p>
+      <p className="text-gray-500 text-center">Please try again.</p>
+    </div>
+  )}
+</div>
+
       )}
 
       {isSureLogout && (
-        <div className="fixed p-5 inset-0 backdrop-blur-xs flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 transition-all duration-300 p-5">
+  <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md flex flex-col items-center justify-center gap-6 transform transition-all duration-300">
+    <h2 className="text-2xl font-semibold text-gray-900 text-center">
+      Log Out
+    </h2>
 
-            <div className="bg-white gap-5 p-6 rounded-2xl shadow-xl w-full max-w-md flex flex-col items-center justify-center">
+    <p className="text-gray-600 text-center text-lg">
+      Are you sure you want to log out?
+    </p>
 
-          <p className="text-gray-800 text-lg">Are you sure you want to logout?</p>
-          <div className="w-full flex justify-center gap-5">
-        <button
-          onClick={handleLogout}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-800 transition"
-        >
-          Yes
-        </button>
-        <button
-          onClick={() => setIsSureLogout(false)}
-          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-700 transition"
-        >
-          No
-        </button>
+    <div className="w-full flex justify-center gap-4 mt-4">
+      <button
+        onClick={handleLogout}
+        className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 shadow-sm transition-all duration-200"
+      >
+        Yes, Log Out
+      </button>
+      <button
+        onClick={() => setIsSureLogout(false)}
+        className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all duration-200"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
 
-          </div>
-            </div>
-
-          
-        </div>
       )}
 
       <header className="bg-white fixed w-full shadow-sm p-4 flex justify-between items-center">
