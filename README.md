@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ai Tutor — Onboarding
 
-## Getting Started
+Concise, local-first developer README for the Ai Tutor onboarding demo app.
 
-First, run the development server:
+This repository is a Next.js (App Router + TypeScript) application that powers an onboarding flow and lesson interfaces. It uses Prisma for the database layer and is designed to run locally for development.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## What this repo contains
+
+- Next.js app (App Router) under `src/app` with pages and API routes.
+- Prisma schema and migrations under `prisma/`.
+- Context and small libs under `src/context` and `src/lib`.
+
+## Tech stack
+
+- Next.js (App Router)
+- TypeScript
+- Prisma (ORM)
+- Node.js
+
+## Quick start — run locally
+
+1. Install dependencies
+
+```powershell
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Copy environment variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```powershell
+copy .env.example .env
+# then edit .env to set any DB or secret values
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Prepare the database (Prisma)
 
-## Learn More
+If you are using SQLite (default for many local setups) the example `.env` should work out of the box. For other databases, set `DATABASE_URL` in `.env`.
 
-To learn more about Next.js, take a look at the following resources:
+```powershell
+npx prisma migrate dev --name init
+npx prisma generate
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. Run the dev server
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```powershell
+npm run dev
+```
 
-## Deploy on Vercel
+Open http://localhost:3000 in your browser.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Important env vars
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `.env.example` contains the variables you should copy into `.env`.
+- Typical variables used by this project:
+  - DATABASE_URL — Prisma connection string
+  - NEXT_PUBLIC_BASE_URL — (optional) absolute URL for previews or callbacks
+  - NEXTAUTH_SECRET or other auth-related secrets if enabled
+
+If you need help discovering required variables, open `.env.example` in the repo root.
+
+## Useful npm scripts
+
+- `npm run dev` — starts Next.js in development mode
+- `npm run build` — builds the app for production
+- `npm run start` — runs the production build locally
+- `npm run prisma` — (if present) convenience script for Prisma commands
+
+Check `package.json` for the exact scripts available in this repo.
+
+## Prisma and database notes
+
+- Migrations are in `prisma/migrations` — keep them committed.
+- To reset local DB (dangerous on production):
+
+```powershell
+npx prisma migrate reset
+```
+
+Run `npx prisma studio` to open a local GUI and inspect data.
+
+## Development tips
+
+- Edit routes and UI under `src/app`.
+- Shared logic and helpers live in `src/lib` and `src/context`.
+- If you add types, update `src/types` accordingly.
+
+## Troubleshooting
+
+- If the app fails to start because of the database, confirm `DATABASE_URL` in `.env` and run `npx prisma migrate dev`.
+- If TypeScript reports missing types, run `npm run build` to produce clearer errors, then fix or add types.
+
+## Contributing
+
+Small contributions and bug reports are welcome. For anything non-trivial, please open an issue describing the change first.
+
+## License
+
+This project doesn't include a license file by default — add one (for example, MIT) if you intend to publish or share the repository publicly.
+
+---
+
+If you'd like, I can also:
+
+- add a small `prisma` script to `package.json` for convenience,
+- create a quick start `docker-compose.yml` for a Postgres-backed dev DB,
+- or run a quick check of `package.json` and `prisma/schema.prisma` to surface any obvious missing env vars. Tell me which and I'll proceed.
