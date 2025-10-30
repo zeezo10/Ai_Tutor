@@ -28,13 +28,13 @@ export default function HomePage() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
           <Link
             href="/pages/signup"
-            className="px-8 py-4 bg-indigo-600 text-white rounded-xl font-semibold text-lg hover:bg-indigo-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            className="px-8 py-4 cursor-pointer bg-indigo-600 text-white rounded-xl font-semibold text-lg hover:bg-indigo-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1"
           >
             Get Started Free
           </Link>
           <Link
             href="/pages/login"
-            className="px-8 py-4 bg-white text-indigo-600 rounded-xl font-semibold text-lg hover:bg-gray-50 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1 border-2 border-indigo-600"
+            className="px-8 py-4 cursor-pointer bg-white text-indigo-600 rounded-xl font-semibold text-lg hover:bg-gray-50 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1 border-2 border-indigo-600"
           >
             Login
           </Link>

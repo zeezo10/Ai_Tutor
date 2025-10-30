@@ -195,7 +195,7 @@ export default function OnboardingPage() {
         <h1 className="text-2xl font-bold text-indigo-600">Verba Lesson</h1>
         <Link 
           href="/pages/dashboard"
-          className="text-gray-500 hover:text-blue-600 transition"
+          className="text-gray-500 cursor-pointer hover:text-blue-600 transition"
         >
           Back To Dashboard
         </Link>
@@ -251,7 +251,7 @@ export default function OnboardingPage() {
             <button
               onClick={() => handleStartLesson("")}
               disabled={loading || !input.trim()}
-              className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-indigo-700 disabled:bg-gray-400 transition"
+              className="bg-indigo-600 cursor-pointer text-white px-6 py-2 rounded-lg font-semibold hover:bg-indigo-700 disabled:bg-gray-400 transition"
             >
               {loading ? "Sending..." : "Send"}
             </button>

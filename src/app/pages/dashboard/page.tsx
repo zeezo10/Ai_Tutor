@@ -156,13 +156,13 @@ export default function DashboardPage() {
       <div className="mt-8 flex flex-col gap-3">
         <button
           onClick={handleChangeGoal}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold shadow-sm transition-all duration-200"
+          className="bg-indigo-600 cursor-pointer hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold shadow-sm transition-all duration-200"
         >
           {!isLoading ? "Save Change" : "Saving..."}
         </button>
         <button
           onClick={() => setShowModal(false)}
-          className="bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-semibold transition-all duration-200"
+          className="bg-gray-100 cursor-pointer hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-semibold transition-all duration-200"
         >
           Cancel
         </button>
@@ -235,13 +235,13 @@ export default function DashboardPage() {
     <div className="w-full flex justify-center gap-4 mt-4">
       <button
         onClick={handleLogout}
-        className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 shadow-sm transition-all duration-200"
+        className="px-6 py-3 cursor-pointer bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 shadow-sm transition-all duration-200"
       >
         Yes, Log Out
       </button>
       <button
         onClick={() => setIsSureLogout(false)}
-        className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all duration-200"
+        className="px-6 py-3 cursor-pointer bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all duration-200"
       >
         Cancel
       </button>
@@ -255,7 +255,7 @@ export default function DashboardPage() {
         <h1 className="text-2xl font-bold text-indigo-600">My Dashboard</h1>
         <button
           onClick={() => setIsSureLogout(true)}
-          className={`px-5 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition`}
+          className={`px-5 py-2 cursor-pointer bg-red-500 text-white rounded-lg hover:bg-red-700 transition`}
         >
           Logout
         </button>
@@ -298,7 +298,7 @@ export default function DashboardPage() {
                   <button
                     onClick={() => setShowModal(true)}
                     disabled={input.trim() === ""}
-                    className="bg-indigo-600 text-white w-20 py-2 rounded-lg font-semibold hover:bg-indigo-700 disabled:bg-gray-400 transition"
+                    className="bg-indigo-600 cursor-pointer text-white w-20 py-2 rounded-lg font-semibold hover:bg-indigo-700 disabled:bg-gray-400 transition"
                   >
                     Save
                   </button>
@@ -349,7 +349,7 @@ export default function DashboardPage() {
           </div>
           <button
             onClick={() => router.push("/pages/lesson")}
-            className="mt-6 w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition"
+            className="mt-6 w-full cursor-pointer bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition"
           >
             {state.messages.length === 0 ? "Start lesson" : "Continue Learning"}
           </button>

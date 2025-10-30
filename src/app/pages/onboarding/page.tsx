@@ -175,7 +175,7 @@ export default function OnboardingPage() {
           <button
             onClick={handleStartLesson}
             disabled={loading}
-            className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 disabled:bg-gray-400 transition"
+            className="w-full bg-green-60 cursor-pointer text-white py-3 rounded-lg font-semibold hover:bg-green-700 disabled:bg-gray-400 transition"
           >
             Go To Dashboard{" "}
           </button>
@@ -193,7 +193,7 @@ export default function OnboardingPage() {
             <button
               onClick={handleSend}
               disabled={loading || !input.trim()}
-              className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-indigo-700 disabled:bg-gray-400 transition"
+              className="bg-indigo-600 cursor-pointer text-white px-6 py-2 rounded-lg font-semibold hover:bg-indigo-700 disabled:bg-gray-400 transition"
             >
               Send
             </button>
