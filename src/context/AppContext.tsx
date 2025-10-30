@@ -2,12 +2,21 @@
 
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
+// ✅ Export Types
+export interface LessonData {
+  title: string;
+  greeting: string;
+  lesson: string;
+  practice: string;
 }
 
-interface User {
+export interface Message {
+  role: "user" | "assistant";
+  content: string;
+  lessonData?: LessonData; 
+}
+
+export interface User {
   id: number;
   name: string;
   email: string;
@@ -23,14 +32,13 @@ interface AppState {
   onboardingComplete: boolean;
 }
 
-
-
 type Action =
   | { type: 'SET_USER'; payload: { user: User; token: string } }
+  | { type: 'UPDATE_USER'; payload: Partial<User> }
   | { type: 'LOGOUT' }
   | { type: 'ADD_MESSAGE'; payload: Message }
   | { type: 'SET_MESSAGES'; payload: Message[] }
-  | { type: 'SET_boardingComplete' }
+  | { type: 'SET_ONBOARDING_COMPLETE' }
   | { type: 'CLEAR_MESSAGES' };
 
 const initialState: AppState = {
@@ -55,8 +63,16 @@ function appReducer(state: AppState, action: Action): AppState {
         token: action.payload.token,
         isAuthenticated: true,
       };
+    
+    case 'UPDATE_USER':
+      return {
+        ...state,
+        user: state.user ? { ...state.user, ...action.payload } : null,
+      };
+    
     case 'LOGOUT':
       return initialState;
+    
     case 'ADD_MESSAGE':
       return {
         ...state,
@@ -71,27 +87,40 @@ function appReducer(state: AppState, action: Action): AppState {
         ...state,
         messages: [],
       };
-    case 'SET_boardingComplete':
+    
+    case 'SET_ONBOARDING_COMPLETE':
       return {
         ...state,
         onboardingComplete: true,
       };
+    
     default:
       return state;
   }
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
- const [state, dispatch] = useReducer(appReducer, initialState, () => {
+  const [state, dispatch] = useReducer(appReducer, initialState, () => {
     if (typeof window !== 'undefined') {
-      const savedState = localStorage.getItem('appState');
-      return savedState ? JSON.parse(savedState) : initialState;
+      try {
+        const savedState = localStorage.getItem('appState');
+        if (savedState) {
+          return JSON.parse(savedState);
+        }
+      } catch (error) {
+        console.error('Failed to load state:', error);
+        localStorage.removeItem('appState');
+      }
     }
     return initialState;
   });
 
   React.useEffect(() => {
-    localStorage.setItem('appState', JSON.stringify(state));
+    try {
+      localStorage.setItem('appState', JSON.stringify(state));
+    } catch (error) {
+      console.error('Failed to save state:', error);
+    }
   }, [state]);
 
   return (
@@ -107,4 +136,35 @@ export function useApp() {
     throw new Error('useApp must be used within AppProvider');
   }
   return context;
+}
+
+// ✅ Type Guard
+export function isLessonMessage(msg: Message): msg is Message & { lessonData: LessonData } {
+  return msg.lessonData !== undefined;
+}
+
+// ✅ Helper Functions
+export const clearAuthData = () => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('appState');
+  }
+};
+
+// ✅ Custom Hook
+export function useMessages() {
+  const { state, dispatch } = useApp();
+  
+  const addMessage = (message: Message) => {
+    dispatch({ type: 'ADD_MESSAGE', payload: message });
+  };
+  
+  const clearMessages = () => {
+    dispatch({ type: 'CLEAR_MESSAGES' });
+  };
+  
+  return {
+    messages: state.messages,
+    addMessage,
+    clearMessages,
+  };
 }

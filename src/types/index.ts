@@ -1,3 +1,18 @@
+// ✅ 1. عرّف LessonData أولاً
+export interface LessonData {
+  title: string;
+  greeting: string;
+  lesson: string;
+  practice: string;
+}
+
+// ✅ 2. ثم استخدمه في Message
+export interface Message {
+  role: "user" | "assistant";
+  content: string;
+  lessonData?: LessonData; // الآن LessonData معرّف
+}
+
 export interface User {
   id: number;
   name: string;
@@ -5,11 +20,6 @@ export interface User {
   goal?: string;
   level?: string;
   createdAt: Date;
-}
-
-export interface Message {
-  role: 'user' | 'assistant' | 'system';
-  content: string;
 }
 
 export interface Conversation {
@@ -30,6 +40,7 @@ export interface ChatResponse {
   onboardingComplete?: boolean;
 }
 
+// ✅ 3. حدّث LessonResponse ليرجع object بدلاً من string
 export interface LessonResponse {
-  lesson: string;
+  lesson: LessonData; // ✅ بدلاً من string
 }

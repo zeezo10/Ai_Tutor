@@ -18,37 +18,67 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!state.isAuthenticated) {
-      router.push("/pages/login");
-    }
+  if (!state.isAuthenticated) {
+    router.push("/pages/login");
+    return;
+  }
 
-    if (!state.user?.id) return;
+  if (!state.user?.id) return;
 
-    const userId = state.user.id;
+  const userId = state.user.id;
 
-    const fetchConversation = async () => {
-      try {
-        const res = await fetch(
-          `/api/conversation?userId=${encodeURIComponent(userId)}`
-        );
-
-        if (!res.ok) {
-          return;
+  const fetchConversation = async () => {
+    try {
+      const res = await fetch(
+        `/api/conversation?userId=${encodeURIComponent(userId)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${state.token}`, 
+          },
         }
+      );
 
-        const data = await res.json();
-
-        if (data?.messages) {
-          dispatch({ type: "SET_MESSAGES", payload: data.messages });
-        }
-      } catch (error) {
-        console.error("Error fetching conversation:", error);
+      if (!res.ok) {
+        console.error("Failed to fetch conversation:", res.status);
         return;
       }
-    };
 
-    fetchConversation();
-  }, [state.isAuthenticated, state.user?.id, router]);
+      const data = await res.json();
+
+      if (data?.messages) {
+       
+        const processedMessages = data.messages.map((msg: any) => {
+        
+          if (msg.role === "assistant" && msg.content) {
+            try {
+         
+              const parsed = JSON.parse(msg.content);
+  
+              if (parsed.title && parsed.greeting && parsed.lesson && parsed.practice) {
+                return {
+                  ...msg,
+                  content: parsed.greeting,
+                  lessonData: parsed,
+                };
+              }
+            } catch {
+
+            }
+          }
+          
+          return msg;
+        });
+
+        dispatch({ type: "SET_MESSAGES", payload: processedMessages });
+      }
+    } catch (error) {
+      console.error("Error fetching conversation:", error);
+    }
+  };
+
+  fetchConversation();
+}, [state.isAuthenticated, state.user?.id, state.token, router, dispatch]);
+
 
   const handleLogout = () => {
     dispatch({ type: "LOGOUT" });
@@ -183,7 +213,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <header className="bg-white shadow-sm p-4 flex justify-between items-center">
+      <header className="bg-white fixed w-full shadow-sm p-4 flex justify-between items-center">
         <h1 className="text-2xl font-bold text-indigo-600">My Dashboard</h1>
         <button
           onClick={() => setIsSureLogout(true)}
@@ -194,7 +224,7 @@ export default function DashboardPage() {
 
       </header>
 
-      <div className="container mx-auto p-6 max-w-4xl">
+      <div className="container mx-auto p-6 pt-24 md:pt-40 max-w-4xl">
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
           <h2 className="text-3xl font-bold text-gray-800 mb-4">
             Welcome {state.user.name}! 👋

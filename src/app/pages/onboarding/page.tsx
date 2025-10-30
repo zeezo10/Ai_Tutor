@@ -56,7 +56,7 @@ export default function OnboardingPage() {
     }
   }, [state.messages, isInitialized]);
 
-  // Auto-scroll to bottom when messages change
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [state.messages]);
@@ -114,7 +114,7 @@ export default function OnboardingPage() {
         });
 
         dispatch({
-          type: "SET_boardingComplete",
+          type: "SET_ONBOARDING_COMPLETE",
         });
 
         // setTimeout(() => router.push('/dashboard'), 5000);
@@ -159,8 +159,13 @@ export default function OnboardingPage() {
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-white px-4 py-2 rounded-2xl shadow text-gray-500">
-              Typing...
+            <div className="bg-white px-4 py-2 rounded-2xl shadow text-gray-500 animate-pulse">
+              <span className="inline-flex gap-1">
+                Typing
+                <span className="animate-bounce">.</span>
+                <span className="animate-bounce delay-100">.</span>
+                <span className="animate-bounce delay-200">.</span>
+              </span>
             </div>
           </div>
         )}
